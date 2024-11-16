@@ -1,0 +1,26 @@
+services:
+  acme.sh:
+    image: neilpang/acme.sh:3.0.9
+    container_name: acme.sh
+    volumes:
+      - ./var/acme.sh:/acme.sh
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DEPLOY_DOCKER_CONTAINER_LABEL=sh.acme.autoload.container=nginx
+      - DEPLOY_DOCKER_CONTAINER_KEY_FILE=/etc/nginx/ssl/${domain}/key.pem
+      - DEPLOY_DOCKER_CONTAINER_CERT_FILE="/etc/nginx/ssl/${domain}/cert.pem"
+      - DEPLOY_DOCKER_CONTAINER_CA_FILE="/etc/nginx/ssl/${domain}/ca.pem"
+      - DEPLOY_DOCKER_CONTAINER_FULLCHAIN_FILE="/etc/nginx/ssl/${domain}/full.pem"
+      - DEPLOY_DOCKER_CONTAINER_RELOAD_CMD="service nginx force-reload"
+  nginx:
+    image: nginx:1.27.2-alpine
+    container_name: nginx
+    ports:
+      - "80:80/tcp"
+    volumes:
+      - ./etc/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./etc/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./var/nginx/ssl:/etc/nginx/ssl
+      - ./var/nginx/cache:/var/cache/nginx
+      - ./var/nginx/run:/var/run
+      - ./var/nginx/log:/var/log/nginx
