@@ -35,6 +35,7 @@ ignoreip = 127.0.0.1/8 xx.xx.xx.xx
 systemctl enable fail2ban
 systemctl start fail2ban
 
+ln -s /usr/bin/dco docker-compose
 
 # useful commands
 
@@ -51,3 +52,13 @@ lsof -i -P
 alias mc='PROMPT_COMMAND="history -a; history -r" mc; history -r'
 
 journalctl -r -n 100
+
+
+# managing docker containers
+
+dco up -d nginx
+dco run --rm acme.sh --issue -d example.com -d additional.com --server letsencrypt --email xxx@xxx.xxx --keylength ec-256 --standalone
+dco run --rm acme.sh --issue -d example.com -d additional.com --server letsencrypt_test --email xxx@xxx.xxx --keylength ec-256 --standalone
+
+domain=example.com dco run --rm acme.sh --deploy -d ${domain} --deploy-hook docker
+domain=example.com dco run --rm acme.sh --cron >> /var/log/acme.log 2>&1

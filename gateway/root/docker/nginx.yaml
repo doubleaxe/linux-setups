@@ -7,16 +7,19 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - DEPLOY_DOCKER_CONTAINER_LABEL=sh.acme.autoload.container=nginx
-      - DEPLOY_DOCKER_CONTAINER_KEY_FILE=/etc/nginx/ssl/${domain}/key.pem
-      - DEPLOY_DOCKER_CONTAINER_CERT_FILE="/etc/nginx/ssl/${domain}/cert.pem"
-      - DEPLOY_DOCKER_CONTAINER_CA_FILE="/etc/nginx/ssl/${domain}/ca.pem"
-      - DEPLOY_DOCKER_CONTAINER_FULLCHAIN_FILE="/etc/nginx/ssl/${domain}/full.pem"
-      - DEPLOY_DOCKER_CONTAINER_RELOAD_CMD="service nginx force-reload"
+      - DEPLOY_DOCKER_CONTAINER_KEY_FILE=/etc/nginx/ssl/${domain:-default}/key.pem
+      - DEPLOY_DOCKER_CONTAINER_CERT_FILE="/etc/nginx/ssl/${domain:-default}/cert.pem"
+      - DEPLOY_DOCKER_CONTAINER_CA_FILE="/etc/nginx/ssl/${domain:-default}/ca.pem"
+      - DEPLOY_DOCKER_CONTAINER_FULLCHAIN_FILE="/etc/nginx/ssl/${domain:-default}/full.pem"
+      - DEPLOY_DOCKER_CONTAINER_RELOAD_CMD="nginx -s reload"
   nginx:
     image: nginx:1.27.2-alpine
     container_name: nginx
+    restart: unless-stopped
     ports:
       - "80:80/tcp"
+    labels:
+      - sh.acme.autoload.container=nginx
     volumes:
       - ./etc/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./etc/nginx/conf.d:/etc/nginx/conf.d:ro
