@@ -4,8 +4,8 @@ services:
     container_name: warp
     mem_limit: 100m
     environment:
-      # port 40000 is hardcoded
-      - "PROXY_PORT=40000"
+      # port 40000 is hardcoded for socat
+      - "PROXY_PORT=1080"
       - "WARP_LICENSE="
       - "FAMILIES_MODE=off"
     volumes:
@@ -23,5 +23,7 @@ services:
     volumes:
       - ./var/lib/3x-ui/db/:/etc/x-ui/
       - ./var/lib/3x-ui/cert/:/root/cert/
-      - ./var/log/3x-ui/:/var/log/3x-ui/
+      - ./var/log/3x-ui/access.log:/app/access.log
+      - ./var/log/3x-ui/error.log:/app/error.log
+      - ./var/log/3x-ui/fail2ban.log:/var/log/fail2ban.log
     restart: unless-stopped

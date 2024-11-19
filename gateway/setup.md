@@ -30,6 +30,9 @@ ufw allow 80/tcp
 ufw allow 443/tcp
 ufw enable
 ufw status
+ufw status numbered
+ufw delete 3
+ufw delete allow 8888/tcp
 
 apt install fail2ban
 mcedit /etc/fail2ban/jail.d/defaults-debian.conf
@@ -67,9 +70,10 @@ journalctl -r -n 100
 # managing docker containers
 
 dco up -d nginx acme.sh
-dco exec acme.sh --issue -d example.com -d additional.com --server letsencrypt --email xxx@xxx.xxx --keylength ec-256 --standalone
-dco exec acme.sh --issue -d example.com -d additional.com --server letsencrypt_test --email xxx@xxx.xxx --keylength ec-256 --standalone
+dco exec acme-sh --issue -d example.com -d additional.com --server letsencrypt --email xxx@xxx.xxx --keylength ec-256 --standalone
+dco exec acme-sh --issue -d example.com -d additional.com --server letsencrypt_test --email xxx@xxx.xxx --keylength ec-256 --standalone
 
+dco exec nginx nginx -t
 dco exec nginx nginx -s reload
 ./acme-deploy.sh example.com
-dco exec acme.sh --remove -d example.com
+dco exec acme-sh --remove -d example.com

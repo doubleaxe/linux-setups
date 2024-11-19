@@ -16,6 +16,8 @@ services:
     ports:
       - "80:80/tcp"
       - "443:443/tcp"
+    depends_on:
+      - 3x-ui
     labels:
       - sh.acme.autoload.container=nginx
     volumes:
