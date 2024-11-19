@@ -12,6 +12,16 @@ systemctl reload ssh
 apt install docker.io docker-compose git curl bash openssl
 docker -v
 docker-compose -v
+mcedit /etc/docker/daemon.json
+```
+{
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "2m",
+    "max-file": "2"
+  }
+}
+```
 reboot
 
 apt install ufw
@@ -56,9 +66,10 @@ journalctl -r -n 100
 
 # managing docker containers
 
-dco up -d nginx
-dco run --rm acme.sh --issue -d example.com -d additional.com --server letsencrypt --email xxx@xxx.xxx --keylength ec-256 --standalone
-dco run --rm acme.sh --issue -d example.com -d additional.com --server letsencrypt_test --email xxx@xxx.xxx --keylength ec-256 --standalone
+dco up -d nginx acme.sh
+dco exec acme.sh --issue -d example.com -d additional.com --server letsencrypt --email xxx@xxx.xxx --keylength ec-256 --standalone
+dco exec acme.sh --issue -d example.com -d additional.com --server letsencrypt_test --email xxx@xxx.xxx --keylength ec-256 --standalone
 
-domain=example.com dco run --rm acme.sh --deploy -d ${domain} --deploy-hook docker
-domain=example.com dco run --rm acme.sh --cron >> /var/log/acme.log 2>&1
+dco exec nginx nginx -s reload
+./acme-deploy.sh example.com
+dco exec acme.sh --remove -d example.com
