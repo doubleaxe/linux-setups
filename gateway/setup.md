@@ -77,3 +77,8 @@ dco exec nginx nginx -t
 dco exec nginx nginx -s reload
 ./acme-deploy.sh example.com
 dco exec acme-sh --remove -d example.com
+
+./acme-deploy.sh mx.example.com mailserver /tmp/dms/custom-certs "supervisorctl restart postfix && supervisorctl restart dovecot"
+dco exec mailserver setup help
+dco exec mailserver setup email add user@example.com
+dco exec mailserver setup alias add postmaster@example.com user@example.com

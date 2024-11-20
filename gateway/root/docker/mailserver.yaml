@@ -1,0 +1,32 @@
+services:
+  mailserver:
+    image: ghcr.io/docker-mailserver/docker-mailserver:14.0.0
+    container_name: mailserver
+    hostname: mx.example.com
+    env_file: mailserver.env
+    # ./acme-deploy.sh mx.example.com mailserver /tmp/dms/custom-certs "supervisorctl restart postfix && supervisorctl restart dovecot"
+    environment:
+      - SSL_TYPE=manual
+      - SSL_CERT_PATH=/tmp/dms/custom-certs/mx.example.com/full.pem
+      - SSL_KEY_PATH=/tmp/dms/custom-certs/mx.example.com/key.pem
+    ports:
+      - "25:25"    # SMTP  (explicit TLS => STARTTLS, Authentication is DISABLED => use port 465/587 instead)
+      # - "143:143"  # IMAP4 (explicit TLS => STARTTLS)
+      - "465:465"  # ESMTP (implicit TLS)
+      # - "587:587"  # ESMTP (explicit TLS => STARTTLS)
+      - "993:993"  # IMAP4 (implicit TLS)
+    labels:
+      - sh.acme.autoload.container=mailserver
+    volumes:
+      - ./var/dms/mail/:/var/mail/
+      - ./var/dms/mail-state/:/var/mail-state/
+      - ./var/log/mail/:/var/log/mail/
+      - ./var/lib/dms/config/:/tmp/docker-mailserver/
+      - ./var/lib/dms/ssl/:/tmp/dms/custom-certs/
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
+    stop_grace_period: 1m
+    healthcheck:
+      test: "ss --listening --tcp | grep -P 'LISTEN.+:smtp' || exit 1"
+      timeout: 3s
+      retries: 0
