@@ -1,7 +1,7 @@
 services:
-  mailserver:
+  dms:
     image: ghcr.io/docker-mailserver/docker-mailserver:14.0.0
-    container_name: mailserver
+    container_name: dms
     hostname: mx.example.com
     env_file: mailserver.env
     # ./acme-deploy.sh mx.example.com mailserver /tmp/dms/custom-certs "supervisorctl restart postfix && supervisorctl restart dovecot"
@@ -18,13 +18,14 @@ services:
     labels:
       - sh.acme.autoload.container=mailserver
     volumes:
-      - ./var/dms/mail/:/var/mail/
-      - ./var/dms/mail-state/:/var/mail-state/
-      - ./var/log/mail/:/var/log/mail/
-      - ./var/lib/dms/config/:/tmp/docker-mailserver/
+      - ./private/dms/mail/:/var/mail/
+      - ./private/dms/mail-state/:/var/mail-state/
+      - ./var/log/dms/:/var/log/mail/
+      - ./private/lib/dms/config/:/tmp/docker-mailserver/
       - ./var/lib/dms/ssl/:/tmp/dms/custom-certs/
       - /etc/localtime:/etc/localtime:ro
-    restart: unless-stopped
+    # resides on encrypted volume
+    restart: on-failure
     stop_grace_period: 1m
     healthcheck:
       test: "ss --listening --tcp | grep -P 'LISTEN.+:smtp' || exit 1"

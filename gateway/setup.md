@@ -19,9 +19,34 @@ mcedit /etc/docker/daemon.json
   "log-opts": {
     "max-size": "2m",
     "max-file": "2"
-  }
+  },
+  "ipv6": true,
+  "fixed-cidr-v6": "fd00:dead:beef::/48"
 }
 ```
+
+cd /usr/local/bin
+curl -Lo https://github.com/robbertkl/docker-ipv6nat/releases/download/v0.4.4/docker-ipv6nat.amd64 docker-ipv6nat
+chmod 755 docker-ipv6nat
+mcedit /etc/systemd/system/docker-ipv6nat.service
+```
+[Unit]
+Description=Docker IPv6-NAT
+After=network.target docker.service
+StartLimitIntervalSec=60
+
+[Service]
+Type=simple
+Restart=on-failure
+RestartSec=10
+ExecStart=/usr/local/bin/docker-ipv6nat -cleanup -retry
+
+[Install]
+WantedBy=multi-user.target
+```
+systemctl start docker-ipv6nat
+systemctl enable docker-ipv6nat
+systemctl status docker-ipv6nat
 reboot
 
 apt install ufw
@@ -69,6 +94,11 @@ journalctl -r -n 100
 
 # managing docker containers
 
+apt install fuse gocryptfs
+gocryptfs -init -plaintextnames /root/docker/private.encrypted
+gocryptfs -suid -dev -exec -allow_other /root/docker/private.encrypted /root/docker/private
+fusermount -u /root/docker/private
+
 dco up -d nginx acme.sh
 dco exec acme-sh --issue -d example.com -d additional.com --server letsencrypt --email xxx@xxx.xxx --keylength ec-256 --standalone
 dco exec acme-sh --issue -d example.com -d additional.com --server letsencrypt_test --email xxx@xxx.xxx --keylength ec-256 --standalone
@@ -79,6 +109,6 @@ dco exec nginx nginx -s reload
 dco exec acme-sh --remove -d example.com
 
 ./acme-deploy.sh mx.example.com mailserver /tmp/dms/custom-certs "supervisorctl restart postfix && supervisorctl restart dovecot"
-dco exec mailserver setup help
-dco exec mailserver setup email add user@example.com
-dco exec mailserver setup alias add postmaster@example.com user@example.com
+dco exec dms setup help
+dco exec dms setup email add user@example.com
+dco exec dms setup alias add postmaster@example.com user@example.com
