@@ -77,8 +77,6 @@ ln -s /usr/bin/dco docker-compose
 
 # useful commands
 
-curl -vvv -x socks5h://127.0.0.1:40000 -sL https://cloudflare.com/cdn-cgi/trace
-
 systemctl status fail2ban --no-pager --full
 fail2ban-client status sshd
 
@@ -93,6 +91,9 @@ journalctl -r -n 100
 
 
 # managing docker containers
+
+dco exec warp curl -vvv -x socks5h://127.0.0.1:1080 -sL https://cloudflare.com/cdn-cgi/trace
+dco exec warp warp-cli --accept-tos status
 
 apt install fuse gocryptfs
 gocryptfs -init -plaintextnames /root/docker/private.encrypted
@@ -112,3 +113,14 @@ dco exec acme-sh --remove -d example.com
 dco exec dms setup help
 dco exec dms setup email add user@example.com
 dco exec dms setup alias add postmaster@example.com user@example.com
+
+dco exec dms setup config dkim
+dco exec dms rspamadm pw
+dco exec dms supervisorctl restart postfix
+dig @1.1.1.1 +short TXT _dmarc.example.com
+dig @1.1.1.1 +short TXT mail._domainkey.example.com
+https://www.mail-tester.com/
+
+dco exec radicale htpasswd -B -c /data/users user1
+mkdir -p /root/docker/private/lib/radicale
+chown 2999:2999 /root/docker/private/lib/radicale

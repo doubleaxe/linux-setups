@@ -21,6 +21,7 @@ services:
       - ./private/dms/mail/:/var/mail/
       - ./private/dms/mail-state/:/var/mail-state/
       - ./var/log/dms/:/var/log/mail/
+      - ./var/log/dms-supervisor/:/var/log/supervisor/
       - ./private/lib/dms/config/:/tmp/docker-mailserver/
       - ./var/lib/dms/ssl/:/tmp/dms/custom-certs/
       - /etc/localtime:/etc/localtime:ro
@@ -29,5 +30,19 @@ services:
     stop_grace_period: 1m
     healthcheck:
       test: "ss --listening --tcp | grep -P 'LISTEN.+:smtp' || exit 1"
+      interval: 300s
       timeout: 3s
       retries: 0
+  radicale:
+    image: tomsquest/docker-radicale:3.3.0.1
+    container_name: radicale
+    environment:
+      - TAKE_FILE_OWNERSHIP=false
+    volumes:
+      - ./private/lib/radicale/:/data/
+      - ./etc/radicale/config.ini:/config/config:ro
+    restart: on-failure
+    healthcheck:
+      test: "curl --fail http://localhost:5232 || exit 1"
+      interval: 300s
+      retries: 3
