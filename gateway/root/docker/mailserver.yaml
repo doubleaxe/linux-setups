@@ -25,6 +25,11 @@ services:
       - ./private/lib/dms/config/:/tmp/docker-mailserver/
       - ./var/lib/dms/ssl/:/tmp/dms/custom-certs/
       - /etc/localtime:/etc/localtime:ro
+    networks:
+      default:
+        aliases:
+          - imap.example.com
+          - smtp.example.com
     # resides on encrypted volume
     restart: on-failure
     stop_grace_period: 1m
@@ -46,3 +51,22 @@ services:
       test: "curl --fail http://localhost:5232 || exit 1"
       interval: 300s
       retries: 3
+  roundcube:
+    image: roundcube/roundcubemail:1.6.9-apache
+    container_name: roundcube
+    environment:
+      - ROUNDCUBEMAIL_DEFAULT_HOST=ssl://imap.example.com
+      - ROUNDCUBEMAIL_DEFAULT_PORT=993
+      - ROUNDCUBEMAIL_SMTP_SERVER=ssl://smtp.example.com
+      - ROUNDCUBEMAIL_SMTP_PORT=465
+      - ROUNDCUBEMAIL_USERNAME_DOMAIN=example.com
+      - ROUNDCUBEMAIL_REQUEST_PATH=/
+      - ROUNDCUBEMAIL_INSTALL_PLUGINS=1
+      - ROUNDCUBEMAIL_DB_TYPE=sqlite
+      - ROUNDCUBEMAIL_COMPOSER_PLUGINS=roundcube/carddav,johndoh/contextmenu,weird-birds/thunderbird_labels,texxasrulez/persistent_login
+      - ROUNDCUBEMAIL_PLUGINS=archive,emoticons,filesystem_attachments,jqueryui,managesieve,markasjunk,newmail_notifier,vcard_attachments,zipdownload,carddav,contextmenu,thunderbird_labels,persistent_login
+    volumes:
+      - ./var/www/roundcube/:/var/www/html/
+      - ./var/lib/roundcube/config/:/var/roundcube/config/
+      - ./var/lib/roundcube/db/:/var/roundcube/db/
+      - ./var/tmp/roundcube/:/tmp/roundcube-temp/

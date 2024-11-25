@@ -25,3 +25,7 @@ services:
       - ./var/cache/nginx:/var/cache/nginx
       - ./var/run/nginx:/var/run
       - ./var/log/nginx:/var/log/nginx
+    networks:
+      default:
+        aliases:
+          - mail.example.com

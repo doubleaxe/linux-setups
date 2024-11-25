@@ -101,8 +101,8 @@ gocryptfs -suid -dev -exec -allow_other /root/docker/private.encrypted /root/doc
 fusermount -u /root/docker/private
 
 dco up -d nginx acme.sh
-dco exec acme-sh --issue -d example.com -d additional.com --server letsencrypt --email xxx@xxx.xxx --keylength ec-256 --standalone
-dco exec acme-sh --issue -d example.com -d additional.com --server letsencrypt_test --email xxx@xxx.xxx --keylength ec-256 --standalone
+dco exec acme-sh --issue -d example.com -d 2.example.com --server letsencrypt --email xxx@example.com --keylength ec-256 --standalone
+dco exec acme-sh --issue -d example.com -d 2.example.com --server letsencrypt_test --email xxx@example.com --keylength ec-256 --standalone
 
 dco exec nginx nginx -t
 dco exec nginx nginx -s reload
@@ -113,6 +113,7 @@ dco exec acme-sh --remove -d example.com
 dco exec dms setup help
 dco exec dms setup email add user@example.com
 dco exec dms setup alias add postmaster@example.com user@example.com
+curl -v --url "imaps://imap.example.com/" --user "user@example.com:***" --request "STATUS INBOX (MESSAGES)"
 
 dco exec dms setup config dkim
 dco exec dms rspamadm pw
