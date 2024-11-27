@@ -65,8 +65,18 @@ services:
       - ROUNDCUBEMAIL_DB_TYPE=sqlite
       - ROUNDCUBEMAIL_COMPOSER_PLUGINS=roundcube/carddav,johndoh/contextmenu,weird-birds/thunderbird_labels,texxasrulez/persistent_login
       - ROUNDCUBEMAIL_PLUGINS=archive,emoticons,filesystem_attachments,jqueryui,managesieve,markasjunk,newmail_notifier,vcard_attachments,zipdownload,carddav,contextmenu,thunderbird_labels,persistent_login
+      - ROUNDCUBEMAIL_UPLOAD_MAX_FILESIZE=20000000
     volumes:
+      - ./etc/roundcube/000-default.conf:/etc/apache2/sites-available/000-default.conf
       - ./var/www/roundcube/:/var/www/html/
-      - ./var/lib/roundcube/config/:/var/roundcube/config/
-      - ./var/lib/roundcube/db/:/var/roundcube/db/
+      - ./private/lib/roundcube/config/:/var/roundcube/config/
+      - ./private/lib/roundcube/db/:/var/roundcube/db/
       - ./var/tmp/roundcube/:/tmp/roundcube-temp/
+      - ./var/log/roundcube/:/var/log/apache2
+    restart: on-failure
+    entrypoint: []
+    command: sh -c "a2enmod remoteip && exec /docker-entrypoint.sh apache2-foreground"
+    logging:
+      driver: journald
+      options:
+        tag: roundcube

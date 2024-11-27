@@ -62,13 +62,27 @@ ufw delete allow 8888/tcp
 apt install fail2ban
 mcedit /etc/fail2ban/jail.d/defaults-debian.conf
 ```
-[sshd]
-enabled = true
-backend = systemd
+[DEFAULT]
+backend = auto
 maxretry = 6
 findtime = 1h
 bantime = 1h
-ignoreip = 127.0.0.1/8 xx.xx.xx.xx
+ignoreip = 127.0.0.1/8 172.18.0.0/16 fd12:2222:1::/64 xx.xx.xx.xx
+[sshd]
+enabled = true
+backend = systemd
+[dovecot]
+enabled = true
+logpath = /root/docker/var/log/dms/mail.log
+[sieve]
+enabled = true
+logpath = /root/docker/var/log/dms/mail.log
+[postfix]
+enabled = true
+logpath = /root/docker/var/log/dms/mail.log
+[roundcube-auth]
+enabled = true
+backend = systemd
 ```
 systemctl enable fail2ban
 systemctl start fail2ban
@@ -88,6 +102,7 @@ lsof -i -P
 alias mc='PROMPT_COMMAND="history -a; history -r" mc; history -r'
 
 journalctl -r -n 100
+journalctl -r -n 100 -u roundcube
 
 
 # managing docker containers
@@ -125,3 +140,5 @@ https://www.mail-tester.com/
 dco exec radicale htpasswd -B -c /data/users user1
 mkdir -p /root/docker/private/lib/radicale
 chown 2999:2999 /root/docker/private/lib/radicale
+
+chmod 777 /root/docker/var/log/roundcube
