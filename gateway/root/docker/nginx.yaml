@@ -25,6 +25,7 @@ services:
       - ./var/cache/nginx:/var/cache/nginx
       - ./var/run/nginx:/var/run
       - ./var/log/nginx:/var/log/nginx
+      - ./var/www/nginx:/var/www
     networks:
       default:
         aliases:
