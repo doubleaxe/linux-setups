@@ -119,6 +119,9 @@ dco up -d nginx acme.sh
 dco exec acme-sh --issue -d example.com -d 2.example.com --server letsencrypt --email xxx@example.com --keylength ec-256 --standalone
 dco exec acme-sh --issue -d example.com -d 2.example.com --server letsencrypt_test --email xxx@example.com --keylength ec-256 --standalone
 
+./acme-deploy.sh example.com
+./acme-deploy.sh mx.example.com mailserver /tmp/dms/custom-certs "supervisorctl restart postfix && supervisorctl restart dovecot"
+
 dco exec nginx nginx -t
 dco exec nginx nginx -s reload
 ./acme-deploy.sh example.com
@@ -127,6 +130,7 @@ dco exec acme-sh --remove -d example.com
 ./acme-deploy.sh mx.example.com mailserver /tmp/dms/custom-certs "supervisorctl restart postfix && supervisorctl restart dovecot"
 dco exec dms setup help
 dco exec dms setup email add user@example.com
+dco exec dms setup email update user@example.com
 dco exec dms setup alias add postmaster@example.com user@example.com
 curl -v --url "imaps://imap.example.com/" --user "user@example.com:***" --request "STATUS INBOX (MESSAGES)"
 
@@ -142,3 +146,8 @@ mkdir -p /root/docker/private/lib/radicale
 chown 2999:2999 /root/docker/private/lib/radicale
 
 chmod 777 /root/docker/var/log/roundcube
+
+# imapsync
+
+brew install imapsync
+pip3 install imapdedup

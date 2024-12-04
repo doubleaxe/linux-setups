@@ -80,3 +80,17 @@ services:
       driver: journald
       options:
         tag: roundcube
+  autodiscover:
+    image: monogramm/autodiscover-email-settings:66c144e
+    container_name: autodiscover
+    environment:
+      - COMPANY_NAME=example.com
+      - SUPPORT_URL=https://autoconfig.example.com
+      - DOMAIN=example.com
+      - IMAP_HOST=imap.example.com
+      - IMAP_PORT=993
+      - IMAP_SOCKET=SSL
+      - SMTP_HOST=smtp.example.com
+      - SMTP_PORT=465
+      - SMTP_SOCKET=SSL
+    restart: unless-stopped
