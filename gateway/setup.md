@@ -73,15 +73,20 @@ enabled = true
 backend = systemd
 [dovecot]
 enabled = true
+chain = DOCKER-USER
 logpath = /root/docker/var/log/dms/mail.log
 [sieve]
 enabled = true
+chain = DOCKER-USER
 logpath = /root/docker/var/log/dms/mail.log
 [postfix]
 enabled = true
+mode = aggressive
+chain = DOCKER-USER
 logpath = /root/docker/var/log/dms/mail.log
 [roundcube-auth]
 enabled = true
+chain = DOCKER-USER
 backend = systemd
 ```
 systemctl enable fail2ban
@@ -147,7 +152,90 @@ chown 2999:2999 /root/docker/private/lib/radicale
 
 chmod 777 /root/docker/var/log/roundcube
 
-# imapsync
+# fetchmail
+
+`/root/docker/private/lib/dms/config/fetchmail.cf`
+
+```
+defaults
+proto imap
+timeout 60
+#idletimeout 1200
+#fetchall
+no rewrite
+keep
+
+poll imap.source.com
+user "remote" is "local"
+pass "1"
+folder "INBOX"
+idle
+```
+
+# imapsync, imapdedup
 
 brew install imapsync
-pip3 install imapdedup
+apt install imapsync
+
+brew install pipx
+pipx install imapdedup
+PATH="~/.local/bin:$PATH"
+
+imapdedup -s imap.example.com -u "email@example.com" -x -l
+imapdedup -s imap.example.com -u "email@example.com" -x -n "INBOX"
+imapdedup -s imap.example.com -u "email@example.com" -x -d "INBOX"
+imapdedup -s imap.example.com -u "email@example.com" -x -d -y "Trash" "INBOX"
+
+imapdedup -s imap.example.com -u "email@example.com" -x -n -r -R "INBOX"
+imapdedup -s imap.example.com -u "email@example.com" -x -d -r -R "INBOX"
+
+imapdedup -s imap.example.com -u "email@example.com" -x -l
+imapdedup -s imap.example.com -u "email@example.com" -x -d -R "INBOX" "INBOX/Folder"
+
+imapdedup -s imap.example.com -u "email@example.com" -x -l | sort -r | xargs sh -c 'imapdedup -s imap.example.com -u "email@example.com" -x -m -c -n "$@"' _
+imapdedup -s imap.example.com -u "email@example.com" -x -l | grep -e '^INBOX' -e '^Sent' | sort -r | xargs sh -c 'imapdedup -s imap.example.com -u "email@example.com" -x -m -c -n "$@"' _
+
+imapsync --dry --host1 imap.source.com --user1 source@source.com --passfile1 1.txt --authmech1 LOGIN --host2 imap.example.com --user2 email@example.com --passfile2 2.txt --authmech2 LOGIN --ssl1 --ssl2 --skipemptyfolders --folderrec Inbox --subfolder2 Archive 
+
+--skipcrossduplicates
+
+
+# isync
+
+brew install isync
+apt install isync
+
+mcedit ~/.mbsyncrc
+first - pre 1.3.0, second - post 1.3.0
+```
+#Expunge Far
+#Expunge Slave
+Create Both
+CopyArrivalDate yes
+
+IMAPStore master
+Host imap.example.com
+User email@example.com
+Pass 1
+#TLSType IMAPS
+#SSLType IMAPS
+
+IMAPStore slave1
+Host imap.source.com
+User source@source.com
+Pass 1
+#TLSType IMAPS
+#SSLType IMAPS
+Trash Trash
+
+Channel slave1
+#Near :slave1:
+#Slave :slave1:
+#Far :master:
+#Master :master:
+Patterns % !Trash
+#Sync PushNew PullFlags PullGone
+#Sync PushNew PullFlags PullDelete
+```
+
+mbsync -c ~/.mbsyncrc -l -a
