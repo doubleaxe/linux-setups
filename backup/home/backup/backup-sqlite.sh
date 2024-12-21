@@ -5,4 +5,4 @@ export file=${1}
 export server=${2:-remote.example.com}
 export prefix=$(date +"%Y%m%d_%H%M%S")
 export suffix=$(basename -- "${file}")
-ssh ubackup@${server} "sqlite3 \"${file}\" .dump | xz -zc9" > "/home/ubackup/remote-backups/${prefix}_${suffix}.xz"
+ssh ubackup@${server} "set -o pipefail; sqlite3 \"${file}\" .dump | xz -zc9" > "/home/ubackup/remote-backups/${prefix}_${suffix}.xz"
