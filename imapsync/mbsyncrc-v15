@@ -1,0 +1,27 @@
+Expunge Near
+Create Both
+CopyArrivalDate yes
+Sync PushNew PullGone
+SyncState  ˜/.local/state/isync/
+
+IMAPStore master
+Host imap.example.com
+User email@example.com
+Pass 1
+TLSType IMAPS
+
+IMAPStore slave1
+Host imap.source.com
+User source@source.com
+Pass 1
+TLSType IMAPS
+Trash Trash
+
+Channel slave1
+Near :slave1:
+Far :master:
+Patterns % !Trash
+
+Channel slave-map
+Near :slave1:SentBox
+Far :master:Sent

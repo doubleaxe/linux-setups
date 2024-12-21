@@ -1,0 +1,27 @@
+Expunge Slave
+Create Both
+CopyArrivalDate yes
+Sync PushNew PullDelete
+SyncState  ˜/.local/state/isync/
+
+IMAPStore master
+Host imap.example.com
+User email@example.com
+Pass 1
+SSLType IMAPS
+
+IMAPStore slave1
+Host imap.source.com
+User source@source.com
+Pass 1
+SSLType IMAPS
+Trash Trash
+
+Channel slave1
+Slave :slave1:
+Master :master:
+Patterns % !Trash
+
+Channel slave-map
+Slave :slave1:SentBox
+Master :master:Sent

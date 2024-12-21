@@ -1,0 +1,15 @@
+[Unit]
+Description=Imapfilter
+After=network.target
+
+[Service]
+Type=simple
+Environment="HOME=/root"
+ExecStart=/usr/bin/imapfilter -c /root/.imapfilter/%i.lua
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
