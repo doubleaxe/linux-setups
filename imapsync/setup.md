@@ -4,8 +4,19 @@
 brew install imapsync
 apt install imapsync
 
-imapsync --dry --host1 imap.source.com --user1 source@source.com --passfile1 1.txt --authmech1 LOGIN --host2 imap.example.com --user2 email@example.com --passfile2 2.txt --authmech2 LOGIN --ssl1 --ssl2 --skipemptyfolders --folderrec Inbox --subfolder2 Archive 
+imapsync --dry --host1 imap.source.com --user1 source@source.com --passfile1 1.txt --authmech1 LOGIN --host2 imap.example.com --user2 email@example.com --passfile2 2.txt --authmech2 LOGIN --ssl1 --ssl2 --skipemptyfolders --folderrec Inbox --subfolder2 Archive
 
+curl -LO https://imapsync.lamiral.info/oauth2/oauth2_imap.zip
+unzip oauth2_imap.zip
+cd oauth2_imap
+cpan install Mail::IMAPClient
+cpan install Email::Address
+cpan -f -i HTTP::Daemon::SSL
+perl oauth2_imap --provider gmail user@gmail.com
+
+imapsync --dry --host1 imap.gmail.com --user1 user@gmail.com --passfile1 1.txt --oauthaccesstoken1 1t.txt --host2 imap.example.com --user2 email@example.com --password2 12qw --authmech2 LOGIN --ssl1 --skipemptyfolders --subscribed --noautomap --useheader "Message-Id" --useheader Date --useheader Subject --useheader From --useheader To --useheader Cc --maxbytespersecond 300_000
+
+--gmail1 implies folder remapping even with --noautomap, must be removed for exact copy
 --skipcrossduplicates
 
 # imapdedup
@@ -25,8 +36,8 @@ imapdedup -s imap.example.com -u "email@example.com" -x -d -r -R "INBOX"
 imapdedup -s imap.example.com -u "email@example.com" -x -l
 imapdedup -s imap.example.com -u "email@example.com" -x -d -R "INBOX" "INBOX/Folder"
 
-imapdedup -s imap.example.com -u "email@example.com" -x -l | sort -r | xargs sh -c 'imapdedup -s imap.example.com -u "email@example.com" -x -m -c -n "$@"' _
-imapdedup -s imap.example.com -u "email@example.com" -x -l | grep -e '^INBOX' -e '^Sent' | sort -r | xargs sh -c 'imapdedup -s imap.example.com -u "email@example.com" -x -m -c -n "$@"' _
+imapdedup -s imap.example.com -u "email@example.com" -x -l | sort -r | tr '\n' '\0' | xargs -0 sh -c 'imapdedup -s imap.example.com -u "email@example.com" -x -m -c -n "$@"' _
+imapdedup -s imap.example.com -u "email@example.com" -x -l | grep -e '^INBOX' -e '^Sent' | sort -r | tr '\n' '\0' | xargs -0 sh -c 'imapdedup -s imap.example.com -u "email@example.com" -x -m -c -n "$@"' _
 
 # mdedup
 
@@ -88,4 +99,4 @@ brew install offlineimap
 brew install pipx
 pipx install offlineimap
 
-Supports IDLE, can synchronize remote to local, but not the other way around.
+Supports IDLE, can synchronize remote to local, or two ways. Much more complex than isync.

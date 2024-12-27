@@ -25,3 +25,11 @@ Patterns % !Trash
 Channel slave-map
 Slave :slave1:SentBox
 Master :master:Sent
+
+Channel slave-gmail
+Slave :slave1:"[Gmail]/Sent Mail"
+Master :master:Sent
+
+Group inbound
+Channel slave1:INBOX
+Channel slave1:Spam

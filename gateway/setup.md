@@ -109,6 +109,8 @@ alias mc='PROMPT_COMMAND="history -a; history -r" mc; history -r'
 journalctl -r -n 100
 journalctl -r -n 100 -u roundcube
 
+find *.7z -print0 | xargs -0 -n1 7z l | grep -i "\.pst"
+
 
 # managing docker containers
 
