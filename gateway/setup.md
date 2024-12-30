@@ -94,6 +94,7 @@ systemctl start fail2ban
 
 ln -s /usr/bin/dco docker-compose
 
+
 # useful commands
 
 systemctl status fail2ban --no-pager --full
@@ -120,6 +121,7 @@ dco exec warp warp-cli --accept-tos status
 apt install fuse gocryptfs
 gocryptfs -init -plaintextnames /root/docker/private.encrypted
 gocryptfs -suid -dev -exec -allow_other /root/docker/private.encrypted /root/docker/private
+touch /root/docker/private/marker
 fusermount -u /root/docker/private
 
 dco up -d nginx acme.sh
@@ -153,6 +155,12 @@ mkdir -p /root/docker/private/lib/radicale
 chown 2999:2999 /root/docker/private/lib/radicale
 
 chmod 777 /root/docker/var/log/roundcube
+
+htpasswd -c /root/docker/etc/nginx/conf.d/htpasswd user
+htpasswd -n user
+
+rclone config
+
 
 # fetchmail
 

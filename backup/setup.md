@@ -24,7 +24,7 @@ useradd -g backup -m -s /bin/bash -u 801 ubackup
 #adduser ubackup sudo
 #deluser ubackup sudo
 ```
-echo "ubackup ALL=NOPASSWD:/usr/bin/rsync" > /etc/sudoers.d/ubackup-rsync
+echo "ubackup ALL=NOPASSWD:/usr/bin/rsync, /usr/bin/gocryptfs" > /etc/sudoers.d/ubackup-rsync
 chmod 440 /etc/sudoers.d/ubackup-rsync
 ```
 su ubackup
@@ -55,3 +55,26 @@ rsync -avR -r --delete --delete-during --rsync-path="{ echo <SUDOPASS>; cat; } |
 ```
 chmod 755 ~/backup-cron.sh
 chmod 755 ~/backup.sh
+
+mcedit /etc/apt/sources.list.d/buster-backports.list
+```
+deb http://archive.debian.org/debian buster-backports main contrib
+deb-src http://archive.debian.org/debian buster-backports main contrib
+```
+apt update
+apt list -a zfsutils-linux
+apt install zfsutils-linux=2.0.3-9~bpo10+1
+
+mkdir -p /pool/debian-local
+truncate -s 20G /pool/backup.pool
+
+/usr/sbin/zpool create -o ashift=12 -o feature@hole_birth=disabled -o feature@encryption=disabled -o feature@multi_vdev_crash_dump=disabled -O compression=zstd-5 -O casesensitivity=sensitive -O atime=off -O normalization=formC -O utf8only=on -O xattr=sa -O dnodesize=auto -O canmount=noauto -O readonly=on fpool /pool/backup.pool
+
+sudo zfs create -o readonly=off -o canmount=noauto -o mountpoint=/pool/debian-local fpool/debian
+sudo zfs mount fpool/debian
+mkdir -p /pool/debian-local/ubackup
+chown ubackup:backup /pool/debian-local/ubackup
+ln -s /pool/debian-local/ubackup /home/ubackup/fpool
+
+tar cfJ remote-backups.tar.xz remote-backups
+tar cf - remote-backups/ | xz -zc9 -T0 - > remote-backups.tar.xz

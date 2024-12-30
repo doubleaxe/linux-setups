@@ -14,3 +14,5 @@ do
         echo "$(date +'%Y%m%d_%H%M%S') backup failed" >> /var/log/backup.log
     fi
 done
+
+./cleanup.sh
