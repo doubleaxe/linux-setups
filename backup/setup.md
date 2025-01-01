@@ -24,7 +24,7 @@ useradd -g backup -m -s /bin/bash -u 801 ubackup
 #adduser ubackup sudo
 #deluser ubackup sudo
 ```
-echo "ubackup ALL=NOPASSWD:/usr/bin/rsync, /usr/bin/gocryptfs" > /etc/sudoers.d/ubackup-rsync
+echo "ubackup ALL=NOPASSWD:/usr/bin/rsync, /usr/bin/gocryptfs, /usr/bin/test" > /etc/sudoers.d/ubackup-rsync
 chmod 440 /etc/sudoers.d/ubackup-rsync
 ```
 su ubackup
@@ -55,6 +55,8 @@ rsync -avR -r --delete --delete-during --rsync-path="{ echo <SUDOPASS>; cat; } |
 ```
 chmod 755 ~/backup-cron.sh
 chmod 755 ~/backup.sh
+
+## zfs
 
 mcedit /etc/apt/sources.list.d/buster-backports.list
 ```

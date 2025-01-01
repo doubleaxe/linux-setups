@@ -7,4 +7,6 @@ sudo -H -u ubackup ./backup-cron.sh
 sudo zfs snapshot fpool/debian@auto-${prefix}
 
 #cleanup
-sudo zfs list -H -t snapshot -o name -S creation | grep '^fpool/debian@auto-' | grep -v '01_0000' | tail -n +30 | xargs --no-run-if-empty -n1 zfs destroy -r
+export snapshots=$(sudo zfs list -H -t snapshot -o name -S creation | grep '^fpool/debian@auto-')
+echo "${snapshots}" | grep -v '_0000' | tail -n +240 | xargs --no-run-if-empty -n1 zfs destroy -r
+echo "${snapshots}" | grep '_0000' | grep -v '01_0000' | tail -n +300 | xargs --no-run-if-empty -n1 zfs destroy -r

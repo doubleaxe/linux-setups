@@ -4,7 +4,7 @@ cd $DIR
 BACKUPS=(
     './backup-sqlite.sh "/usr/local/var/goatcounter/goatcounter.sqlite3"'
     './backup-mysql.sh "daxfb_blueprints" "1"'
-    './backup-rsync.sh /root/docker name'
+    './backup-rsync.sh /root/docker name private'
 )
 for BACKUP in "${BACKUPS[@]}"
 do

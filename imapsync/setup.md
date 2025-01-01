@@ -103,3 +103,15 @@ pipx install offlineimap
 Supports IDLE, can synchronize remote to local, or two ways. Much more complex than isync.
 
 # fetchmail
+
+apt install fetchmail
+chmod 600 ./fetchmailrc
+openssl s_client -connect server.example.com:995 -showcerts
+openssl x509 -in server.example.com.pem -outform DER | openssl md5 -c
+
+mkdir -p /root/fetchmail/ssl/certs
+cp server.example.com.pem /root/fetchmail/ssl/certs/
+c_rehash /root/fetchmail/ssl/certs/
+
+export OPENSSL_CONF=/root/fetchmail/openssl.cnf
+fetchmail -f ./fetchmailrc --sslcertpath "/root/fetchmail/ssl/certs/" -v

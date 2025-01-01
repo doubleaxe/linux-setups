@@ -1,0 +1,1 @@
+* * * * * root ( OPENSSL_CONF=/root/fetchmail/openssl.cnf fetchmail -f /root/fetchmail/fetchmailrc --sslcertpath "/root/fetchmail/ssl/certs/" >> /var/log/fetchmail.log 2>&1 )
