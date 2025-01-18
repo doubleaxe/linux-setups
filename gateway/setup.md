@@ -64,7 +64,7 @@ mcedit /etc/fail2ban/jail.d/defaults-debian.conf
 ```
 [DEFAULT]
 backend = auto
-maxretry = 6
+maxretry = 5
 findtime = 1h
 bantime = 1h
 ignoreip = 127.0.0.1/8 172.18.0.0/16 fd12:2222:1::/64 xx.xx.xx.xx
@@ -88,6 +88,12 @@ logpath = /root/docker/var/log/dms/mail.log
 enabled = true
 chain = DOCKER-USER
 backend = systemd
+[recidive]
+enabled = true
+maxretry = 5
+findtime = 1d
+bantime = 1d
+chain = DOCKER-USER
 ```
 systemctl enable fail2ban
 systemctl start fail2ban

@@ -2,7 +2,40 @@
 # imapsync
 
 brew install imapsync
-apt install imapsync
+
+cd /usr/local/bin
+curl -LO https://raw.githubusercontent.com/imapsync/imapsync/master/imapsync
+chmod +x imapsync
+
+apt install -y            \
+  libauthen-ntlm-perl     \
+  libcgi-pm-perl          \
+  libcrypt-openssl-rsa-perl   \
+  libdata-uniqid-perl         \
+  libencode-imaputf7-perl     \
+  libfile-copy-recursive-perl \
+  libfile-tail-perl        \
+  libio-socket-inet6-perl  \
+  libio-socket-ssl-perl    \
+  libio-tee-perl           \
+  libhtml-parser-perl      \
+  libjson-webtoken-perl    \
+  libmail-imapclient-perl  \
+  libparse-recdescent-perl \
+  libproc-processtable-perl \
+  libmodule-scandeps-perl  \
+  libreadonly-perl         \
+  libregexp-common-perl    \
+  libsys-meminfo-perl      \
+  libterm-readkey-perl     \
+  libtest-mockobject-perl  \
+  libunicode-string-perl   \
+  liburi-perl              \
+  libwww-perl              \
+  libnet-server-perl       \
+  make                     \
+  time                     \
+  cpanminus
 
 imapsync --dry --host1 imap.source.com --user1 source@source.com --passfile1 1.txt --authmech1 LOGIN --host2 imap.example.com --user2 email@example.com --passfile2 2.txt --authmech2 LOGIN --ssl1 --ssl2 --skipemptyfolders --folderrec Inbox --subfolder2 Archive
 
@@ -16,6 +49,7 @@ perl oauth2_imap --provider gmail user@gmail.com
 
 imapsync --dry --host1 imap.gmail.com --user1 user@gmail.com --passfile1 1.txt --oauthaccesstoken1 1t.txt --host2 imap.example.com --user2 email@example.com --password2 12qw --authmech2 LOGIN --ssl1 --skipemptyfolders --subscribed --noautomap --useheader "Message-Id" --useheader Date --useheader Subject --useheader From --useheader To --useheader Cc --maxbytespersecond 300_000
 
+--delete2
 --gmail1 implies folder remapping even with --noautomap, must be removed for exact copy
 --skipcrossduplicates
 
