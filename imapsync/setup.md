@@ -104,6 +104,8 @@ systemctl enable imapfilter@account.service
 systemctl start mbsync.timer
 systemctl enable mbsync.timer
 systemctl list-timers
+systemctl list-unit-files --state=enabled
+systemctl list-units --type=service --state=running
 
 # isync
 

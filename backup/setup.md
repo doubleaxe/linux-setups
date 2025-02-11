@@ -24,7 +24,7 @@ useradd -g backup -m -s /bin/bash -u 801 ubackup
 #adduser ubackup sudo
 #deluser ubackup sudo
 ```
-echo "ubackup ALL=NOPASSWD:/usr/bin/rsync, /usr/bin/gocryptfs, /usr/bin/test" > /etc/sudoers.d/ubackup-rsync
+echo "ubackup ALL=NOPASSWD:/usr/bin/rsync, /usr/bin/gocryptfs, /usr/bin/test, CWD=/root/docker /usr/bin/docker-compose" > /etc/sudoers.d/ubackup-rsync
 chmod 440 /etc/sudoers.d/ubackup-rsync
 ```
 su ubackup

@@ -51,6 +51,12 @@ services:
       test: "curl --fail http://localhost:5232 || exit 1"
       interval: 300s
       retries: 3
+  infcloud:
+    image: waja/infcloud:0.13.1-16
+    container_name: infcloud
+    volumes:
+      - ./etc/infcloud/config/:/srv/infcloud/config/
+    restart: on-failure
   roundcube:
     image: roundcube/roundcubemail:1.6.9-apache
     container_name: roundcube

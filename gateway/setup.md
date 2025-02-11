@@ -156,7 +156,8 @@ dig @1.1.1.1 +short TXT _dmarc.example.com
 dig @1.1.1.1 +short TXT mail._domainkey.example.com
 https://www.mail-tester.com/
 
-dco exec radicale htpasswd -B -c /data/users user1
+dco exec roundcube htpasswd -B -c /data/users user1
+dco exec roundcube htpasswd -B -n user1
 mkdir -p /root/docker/private/lib/radicale
 chown 2999:2999 /root/docker/private/lib/radicale
 
@@ -166,7 +167,6 @@ htpasswd -c /root/docker/etc/nginx/conf.d/htpasswd user
 htpasswd -n user
 
 rclone config
-
 
 # fetchmail
 

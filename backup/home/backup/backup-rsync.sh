@@ -7,7 +7,7 @@ export private=${3:-}
 export server=${4:-remote.example.com}
 
 if [ -n "${private}" ]; then
-  if ssh ubackup@${server} "sudo /usr/bin/test ! -f ${remote}/${private}/marker" ; then
+  if ! ssh ubackup@${server} "sudo /usr/bin/test -f ${remote}/${private}/marker" ; then
     echo "Private directory is not mounted"
     exit 1
   fi
