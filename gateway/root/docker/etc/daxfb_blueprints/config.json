@@ -1,0 +1,5 @@
+{
+    "db": "sqlite:var/daxfb_blueprints.sqlite",
+    "secret": "CHANGEME",
+    "proxy": "loopback, uniquelocal"
+}

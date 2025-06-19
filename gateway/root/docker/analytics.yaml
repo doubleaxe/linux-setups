@@ -1,0 +1,17 @@
+services:
+  daxfb_blueprints:
+    image: daxfb-calculator-link-generator:latest
+    container_name: daxfb_blueprints
+    volumes:
+      - ./etc/daxfb_blueprints/config.json:/usr/local/lib/daxfb_blueprints/etc/config.json
+      - ./private/lib/daxfb_blueprints:/usr/local/lib/daxfb_blueprints/var
+    command: run --config etc/config.json
+    restart: on-failure
+  goatcounter:
+    image: arp242/goatcounter:2.6.0
+    container_name: goatcounter
+    environment:
+      - GOATCOUNTER_TLS=http
+    volumes:
+      - ./var/lib/goatcounter:/home/goatcounter/goatcounter-data
+    restart: unless-stopped

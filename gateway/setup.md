@@ -53,6 +53,9 @@ apt install ufw
 ufw allow 22/tcp
 ufw allow 80/tcp
 ufw allow 443/tcp
+ufw allow 993/tcp
+ufw allow 25/tcp
+ufw allow 465/tcp
 ufw enable
 ufw status
 ufw status numbered

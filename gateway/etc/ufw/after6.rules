@@ -1,0 +1,10 @@
+# Put Docker behind UFW, replace eth0
+*filter
+:DOCKER-USER - [0:0]
+:ufw6-user-input - [0:0]
+
+-A DOCKER-USER -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+-A DOCKER-USER -m conntrack --ctstate INVALID -j DROP
+-A DOCKER-USER -i eth0 -j ufw6-user-input
+-A DOCKER-USER -i eth0 -j DROP
+COMMIT
