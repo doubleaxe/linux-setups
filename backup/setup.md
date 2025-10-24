@@ -80,3 +80,7 @@ ln -s /pool/debian-local/ubackup /home/ubackup/fpool
 
 tar cfJ remote-backups.tar.xz remote-backups
 tar cf - remote-backups/ | xz -zc9 -T0 - > remote-backups.tar.xz
+
+## restore backup to remote
+
+rsync --dry-run -e "ssh -o "IdentitiesOnly=yes" -i "/Volumes/pool/debian/ubackup/usr/home/ubackup/.ssh/id_ed25519"" -a -vO --ignore-existing --rsync-path="sudo rsync" --exclude="var/log" "./remote-backups-aeza/root/docker/" ubackup@77.239.99.31:"/root/docker/"

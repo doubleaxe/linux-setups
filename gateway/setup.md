@@ -4,9 +4,14 @@ apt install mc
 apt update
 apt upgrade
 reboot
-touch /root/authorized_keys
-chmod 600 /root/authorized_keys
+touch /root/.ssh/authorized_keys
+chmod 600 /root/.ssh/authorized_keys
 mcedit /etc/ssh/sshd_config
+```
+PermitRootLogin yes
+ChallengeResponseAuthentication no
+PasswordAuthentication no
+```
 systemctl reload ssh
 
 apt install docker.io docker-compose git curl bash openssl
@@ -70,38 +75,71 @@ backend = auto
 maxretry = 5
 findtime = 1h
 bantime = 1h
+banaction = ufw
+banaction_allports = ufw
 ignoreip = 127.0.0.1/8 172.18.0.0/16 fd12:2222:1::/64 xx.xx.xx.xx
 [sshd]
 enabled = true
 backend = systemd
+banaction = nftables-multiport
+banaction_allports = nftables-allports
 [dovecot]
 enabled = true
-chain = DOCKER-USER
 logpath = /root/docker/var/log/dms/mail.log
 [sieve]
 enabled = true
-chain = DOCKER-USER
 logpath = /root/docker/var/log/dms/mail.log
 [postfix]
 enabled = true
 mode = aggressive
-chain = DOCKER-USER
 logpath = /root/docker/var/log/dms/mail.log
 [roundcube-auth]
 enabled = true
-chain = DOCKER-USER
 backend = systemd
 [recidive]
 enabled = true
 maxretry = 5
 findtime = 1d
 bantime = 1d
-chain = DOCKER-USER
 ```
 systemctl enable fail2ban
 systemctl start fail2ban
 
-ln -s /usr/bin/dco docker-compose
+ln -s /usr/bin/docker-compose /usr/bin/dco
+
+
+# put docker behind ufw
+
+see also https://github.com/chaifeng/ufw-docker
+see also https://github.com/moby/moby/issues/4737#issuecomment-419705925
+
+add /etc/ufw/after.rules
+```
+# Put Docker behind UFW, replace eth0
+*filter
+:DOCKER-USER - [0:0]
+:ufw-user-input - [0:0]
+
+-A DOCKER-USER -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+-A DOCKER-USER -m conntrack --ctstate INVALID -j DROP
+-A DOCKER-USER -i eth0 -j ufw-user-input
+-A DOCKER-USER -i eth0 -j DROP
+COMMIT
+```
+
+add /etc/ufw/after6.rules
+```
+# Put Docker behind UFW, replace eth0
+*filter
+:DOCKER-USER - [0:0]
+:ufw6-user-input - [0:0]
+
+-A DOCKER-USER -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+-A DOCKER-USER -m conntrack --ctstate INVALID -j DROP
+-A DOCKER-USER -i eth0 -j ufw6-user-input
+-A DOCKER-USER -i eth0 -j DROP
+COMMIT
+```
 
 
 # useful commands
@@ -114,12 +152,19 @@ ip addr show
 netstat -pln -l
 lsof -i -P
 
+/root/.bashrc
+```
 alias mc='PROMPT_COMMAND="history -a; history -r" mc; history -r'
+```
 
 journalctl -r -n 100
 journalctl -r -n 100 -u roundcube
 
 find *.7z -print0 | xargs -0 -n1 7z l | grep -i "\.pst"
+
+
+nft list ruleset
+nft list table inet f2b-table
 
 
 # managing docker containers
@@ -170,6 +215,38 @@ htpasswd -c /root/docker/etc/nginx/conf.d/htpasswd user
 htpasswd -n user
 
 rclone config
+
+
+# unmouning private dir on non-ssh logins
+
+use /etc/profile.d/console-unmount.sh and /root/docker/unmount.sh
+```
+#!/bin/sh
+
+# Skip if SSH
+if [ -n "$SSH_CONNECTION" ]; then
+    return 0
+fi
+
+# Skip if not root
+[ "$(id -u)" -eq 0 ] || return 0
+
+# Check if login is on a REAL console TTY (not pts/)
+# Common console TTYs: tty[0-9], ttyS[0-9], hvc[0-9], xvc0, etc.
+case "$(tty 2>/dev/null)" in
+    /dev/tty[0-9]*|/dev/ttyS[0-9]*|/dev/hvc[0-9]*|/dev/xvc0)
+        # This is a physical or VM console login
+        if [ -x /root/docker/unmount.sh ]; then
+            /root/docker/unmount.sh
+        fi
+        ;;
+    *)
+        # Could be sudo, su, or other — skip to avoid false positives
+        return 0
+        ;;
+esac
+```
+
 
 # fetchmail
 

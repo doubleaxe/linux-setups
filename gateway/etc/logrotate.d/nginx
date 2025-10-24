@@ -1,0 +1,14 @@
+/root/docker/var/log/nginx/*.log
+{
+  rotate 7
+  daily
+  missingok
+  notifempty
+  compress
+  delaycompress
+  sharedscripts
+  create 0644 101 root
+  postrotate
+    cd /root/docker && ./proxy-reopen-log.sh
+  endscript
+}
