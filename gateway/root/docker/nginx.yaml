@@ -31,20 +31,10 @@ services:
         aliases:
           - mail.example.com
   #WebDAV support
-#  nginx-extra:
-#    image: xdrum/nginx-extras:latest@sha256:7b1d4bf13ffeedcc8c418524df45c065b81883a1b7c7ccb7122e21af64117a8a
-#    container_name: nginx-extra
-#    restart: on-failure
-#    volumes:
-#      - ./etc/nginx-extra/nginx.conf:/etc/nginx/nginx.conf:ro
-#      - ./etc/nginx-extra/conf.d:/etc/nginx/conf.d:ro
-#      - ./var/cache/nginx-extra:/var/cache/nginx
-#      - ./var/run/nginx-extra:/var/run
-#      - ./private/lib/nginx-extra:/var/www
   apache:
     image: httpd:2.4.63-bookworm
     container_name: apache
-    restart: on-failure
+    restart: "no"
     volumes:
       - ./etc/apache/httpd.conf:/usr/local/apache2/conf/httpd.conf:ro
       - ./etc/apache/extra:/usr/local/apache2/conf/extra:ro

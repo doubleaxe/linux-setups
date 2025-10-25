@@ -31,7 +31,7 @@ services:
           - imap.example.com
           - smtp.example.com
     # resides on encrypted volume
-    restart: on-failure
+    restart: "no"
     stop_grace_period: 1m
     healthcheck:
       test: "ss --listening --tcp | grep -P 'LISTEN.+:smtp' || exit 1"
@@ -46,7 +46,7 @@ services:
     volumes:
       - ./private/lib/radicale/:/data/
       - ./etc/radicale/config.ini:/config/config:ro
-    restart: on-failure
+    restart: "no"
     healthcheck:
       test: "curl --fail http://localhost:5232 || exit 1"
       interval: 300s
@@ -56,7 +56,7 @@ services:
     container_name: infcloud
     volumes:
       - ./etc/infcloud/config/:/srv/infcloud/config/
-    restart: on-failure
+    restart: "no"
   roundcube:
     image: roundcube/roundcubemail:1.6.9-apache
     container_name: roundcube
@@ -79,7 +79,7 @@ services:
       - ./private/lib/roundcube/db/:/var/roundcube/db/
       - ./var/tmp/roundcube/:/tmp/roundcube-temp/
       - ./var/log/roundcube/:/var/log/apache2
-    restart: on-failure
+    restart: "no"
     entrypoint: []
     command: sh -c "a2enmod remoteip && exec /docker-entrypoint.sh apache2-foreground"
     logging:

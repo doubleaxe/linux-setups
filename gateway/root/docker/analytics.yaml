@@ -6,7 +6,7 @@ services:
       - ./etc/daxfb_blueprints/config.json:/usr/local/lib/daxfb_blueprints/etc/config.json
       - ./private/lib/daxfb_blueprints:/usr/local/lib/daxfb_blueprints/var
     command: run --config etc/config.json
-    restart: on-failure
+    restart: "no"
   goatcounter:
     image: arp242/goatcounter:2.6.0
     container_name: goatcounter
